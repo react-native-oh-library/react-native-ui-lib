@@ -1,7 +1,7 @@
 {
-  "name": "react-native-ui-lib",
-  "version": "7.0.0",
-  "main": "src/index.ts",
+  "name": "@react-native-oh-tpl/react-native-ui-lib",
+  "version": "7.29.1-0.0.1",
+  "main": "src/index.js",
   "types": "src/index.d.ts",
   "author": "Ethan Sharabi <ethan.shar@gmail.com>",
   "homepage": "https://github.com/wix/react-native-ui-lib",
@@ -13,6 +13,26 @@
     "type": "git",
     "url": "https://github.com/wix/react-native-ui-lib"
   },
+  "harmony": {
+    "alias": "react-native-ui-lib",
+    "codegenConfig": [
+      {
+        "version": 1,
+        "specPaths": [
+          "./src/native/v1"
+        ]
+      },
+      {
+        "version": 2,
+        "specPaths": [
+          "./src/native/v2"
+        ]
+      }
+    ]
+  },
+  "keywords": [
+    "harmony"
+  ],
   "scripts": {
     "start": "watchman watch-del-all && export DEV_MODE=true && react-native start",
     "start:web": "npm --prefix webDemo run start",

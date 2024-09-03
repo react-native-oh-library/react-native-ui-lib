@@ -8,7 +8,7 @@ import React, {
   forwardRef,
   ForwardedRef
 } from 'react';
-import {StyleProp, StyleSheet, ViewStyle} from 'react-native';
+import {StyleProp, StyleSheet, ViewStyle, Platform} from 'react-native';
 import {DateTimePickerPackage as RNDateTimePicker} from '../../optionalDependencies';
 import {useDidUpdate} from '../../hooks';
 import {Colors} from '../../style';
@@ -264,6 +264,8 @@ const DateTimePicker = forwardRef((props: DateTimePickerPropsInternal, ref: Forw
 
     return (
       <RNDateTimePicker
+        // harmony侧 @react-native-community/datetimepicker 父节点或组件需要设置宽高才进行展示
+        style={Platform.OS === 'harmony' ? { width: '100%', height: 240, backgroundColor: '#fff' } : {}}
         mode={mode}
         value={value || new Date()}
         onChange={handleChange}

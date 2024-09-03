@@ -22,7 +22,7 @@ function breakpointComparator(b1: Breakpoint, b2: Breakpoint) {
 }
 
 const isAndroid: boolean = Platform.OS === 'android';
-const isIOS: boolean = Platform.OS === 'ios';
+const isIOS: boolean = Platform.OS === 'ios' || Platform.OS === 'harmony';
 const isWeb: boolean = Platform.OS === 'web';
 let isTablet: boolean;
 let statusBarHeight: number;
