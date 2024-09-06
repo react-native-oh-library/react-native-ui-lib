@@ -1,7 +1,7 @@
 const childProcess = require('child_process');
 const fs = require('fs');
 
-const BABEL_OPTIONS = `--config-file ./src/.babelrc.json --extensions '.ts,.tsx' --ignore "src/**/*.d.ts"`;
+const BABEL_OPTIONS = `--config-file ./src/.babelrc.json --extensions .ts,.tsx --ignore "src/**/*.d.ts,src/native"`;
 const BABEL_INDEX_EXPORTS_OPTIONS = `--config-file ./src/.babelrc.exports.js`;
 
 console.info('## Start RNUILib Build ##');
