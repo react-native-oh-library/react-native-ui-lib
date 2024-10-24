@@ -204,8 +204,8 @@ const SegmentedControl = (props: SegmentedControlProps) => {
       const isMiddleSelected = !isFirstElementSelected && !isLastElementSelected;
       const insetFix = -CONTAINER_BORDER_WIDTH - (!isFirstElementSelected ? segmentDividerWidth : 1);
       const widthFix = isMiddleSelected ? 2 * segmentDividerWidth : CONTAINER_BORDER_WIDTH + segmentDividerWidth;
-      const inset = withTiming(value[animatedSelectedIndex.value].x + insetFix, TIMING_CONFIG);
-      const width = withTiming(value[animatedSelectedIndex.value].width + widthFix, TIMING_CONFIG);
+      const inset = withTiming(value[animatedSelectedIndex.value]?.x + insetFix, TIMING_CONFIG);
+      const width = withTiming(value[animatedSelectedIndex.value]?.width + widthFix, TIMING_CONFIG);
       return Constants.isRTL ? {width, height, right: inset} : {width, height, left: inset};
     }
     return {};

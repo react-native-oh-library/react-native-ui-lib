@@ -47,18 +47,41 @@ const useOldApi = (props: OldApiProps) => {
             ? dateFormatter(value)
             : dateFormat && moment
               ? moment(value).format(dateFormat)
-              : value.toLocaleDateString();
+              : formatTimestamp(value).formattedDate;
         case 'time':
           return timeFormatter
             ? timeFormatter(value)
             : timeFormat && moment
               ? moment(value).format(timeFormat)
-              : value.toLocaleTimeString();
+              : formatTimestamp(value).formattedTime;
       }
     }
   };
 
   return {getStringValue};
 };
+
+function formatTimestamp(timestamp: any) {
+  const ts = typeof timestamp === 'string' ? Number(timestamp) : timestamp;
+  const date = new Date(ts);
+    
+  if (isNaN(date.getTime())) {
+    return { formattedDate: '', formattedTime: '' };
+  }
+  // const date = new Date(timestamp);
+  
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0'); // 月份从0开始
+  const day = String(date.getDate()).padStart(2, '0');
+  
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  // const seconds = String(date.getSeconds()).padStart(2, '0');
+
+  const formattedDate = `${year}/${month}/${day}`;
+  const formattedTime = `${hours}:${minutes}`;
+
+  return { formattedDate, formattedTime };
+}
 
 export default useOldApi;

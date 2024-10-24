@@ -367,10 +367,10 @@ class Slider extends PureComponent<InternalSliderProps, State> {
     const newX = Constants.isRTL && !this.disableRTL ? trackSize.width - nativeEvent.locationX : nativeEvent.locationX;
 
     if (useRange) {
-      if (this.isDefaultThumbActive() && this._minThumbStyles?.left && newX < this._minThumbStyles?.left) {
+      if (this.isDefaultThumbActive() && this._minThumbStyles?.left && newX < Number(this._minThumbStyles?.left)) {
         // new x is smaller then min but the active thumb is the max
         this.setActiveThumb(this.minThumb);
-      } else if (!this.isDefaultThumbActive() && this._thumbStyles.left && newX > this._thumbStyles.left) {
+      } else if (!this.isDefaultThumbActive() && this._thumbStyles.left && newX > Number(this._thumbStyles.left)) {
         // new x is bigger then max but the active thumb is the min
         this.setActiveThumb(this.thumb);
       }
