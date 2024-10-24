@@ -214,7 +214,7 @@ const Dialog = (props: DialogProps, ref: ForwardedRef<DialogImperativeMethods>) 
   const renderDialog = () => (
     <GestureDetector gesture={panGesture}>
       {/* @ts-expect-error should be fixed in version 3.5 (https://github.com/software-mansion/react-native-reanimated/pull/4881) */}
-      <View {...containerProps} reanimated style={style} onLayout={onLayout} ref={setRef} testID={testID}>
+      <View {...containerProps} style={style} onLayout={onLayout} ref={setRef} testID={testID}>
         {renderDialogContent()}
       </View>
     </GestureDetector>
@@ -228,7 +228,7 @@ const Dialog = (props: DialogProps, ref: ForwardedRef<DialogImperativeMethods>) 
   }, [overlayBackgroundColor]);
 
   const renderOverlayView = () => (
-    <View testID={`${testID}.overlayFadingBackground`} absF reanimated style={overlayStyle} pointerEvents="none"/>
+    <View testID={`${testID}.overlayFadingBackground`} absF style={overlayStyle} pointerEvents="none"/>
   );
 
   return (
