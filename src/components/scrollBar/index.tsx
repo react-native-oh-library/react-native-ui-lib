@@ -6,9 +6,11 @@ import {
   ImageSourcePropType,
   NativeSyntheticEvent,
   NativeScrollEvent,
-  LayoutChangeEvent
+  LayoutChangeEvent,
+  ScrollView, 
+  FlatList
 } from 'react-native';
-import {ScrollView, FlatList} from 'react-native-gesture-handler';
+// import {ScrollView, FlatList} from 'react-native-gesture-handler';
 import {Colors} from '../../style';
 import {Constants, asBaseComponent, forwardRef, ForwardRefInjectedProps} from '../../commons/new';
 import {ComponentStatics} from '../../typings/common';
