@@ -111,7 +111,7 @@ const Toast = (props: PropsWithChildren<ToastProps>) => {
   }, [position]);
 
   const toastStyle = useMemo(() => {
-    return [opacityStyle, containerStyle];
+    return [containerStyle];
   }, [opacityStyle, containerStyle]);
 
   const toastContainerStyle = useMemo(() => {
