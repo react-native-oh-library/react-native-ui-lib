@@ -1,5 +1,5 @@
-import React, {PropsWithChildren, useCallback, useMemo} from 'react';
-import {LayoutChangeEvent} from 'react-native';
+import React, { PropsWithChildren, useCallback, useMemo } from 'react';
+import { LayoutChangeEvent } from 'react-native';
 import Reanimated, {
   useAnimatedGestureHandler,
   useAnimatedStyle,
@@ -9,10 +9,10 @@ import Reanimated, {
   interpolateColor,
   runOnJS
 } from 'react-native-reanimated';
-import {TapGestureHandler, LongPressGestureHandler, State} from 'react-native-gesture-handler';
-import {asBaseComponent, forwardRef, BaseComponentInjectedProps, ForwardRefInjectedProps} from '../commons/new';
-import View, {ViewProps} from '../components/view';
-import {Colors} from '../../src/style';
+import { GestureHandlerRootView, TapGestureHandler, LongPressGestureHandler, State } from 'react-native-gesture-handler';
+import { asBaseComponent, forwardRef, BaseComponentInjectedProps, ForwardRefInjectedProps } from '../commons/new';
+import View, { ViewProps } from '../components/view';
+import { Colors } from '../../src/style';
 
 export type TouchableOpacityProps = {
   /**
@@ -80,7 +80,7 @@ function TouchableOpacity(props: Props) {
     activeScale = 1,
     ...others
   } = props;
-  const {borderRadius, paddings, margins, alignments, flexStyle} = modifiers;
+  const { borderRadius, paddings, margins, alignments, flexStyle } = modifiers;
 
   const isActive = useSharedValue(0);
   /* This flag is for fixing an issue with long press triggering twice
@@ -101,7 +101,7 @@ function TouchableOpacity(props: Props) {
 
   const toggleActive = (value: number) => {
     'worklet';
-    isActive.value = withTiming(value, {duration: 200});
+    isActive.value = withTiming(value, { duration: 200 });
   };
 
   const tapGestureHandler = useAnimatedGestureHandler({
@@ -143,39 +143,41 @@ function TouchableOpacity(props: Props) {
         ? backgroundColor
         : interpolateColor(isActive.value, [0, 1], [backgroundColor, activeColor]),
       opacity,
-      transform: [{scale}]
+      transform: [{ scale }]
     };
   }, [backgroundColor, feedbackColor]);
 
   const Container = props.onLongPress ? LongPressGestureHandler : View;
 
   return (
-    <TapGestureHandler
-      onGestureEvent={tapGestureHandler}
-      shouldCancelWhenOutside
-      enabled={!disabled}
-    >
-      <Reanimated.View>
-        <Container onGestureEvent={longPressGestureHandler} shouldCancelWhenOutside>
-          <Reanimated.View
-            {...others}
-            ref={forwardedRef}
-            style={[
-              borderRadius && {borderRadius},
-              flexStyle,
-              paddings,
-              margins,
-              alignments,
-              {backgroundColor},
-              style,
-              animatedStyle
-            ]}
-          >
-            {children}
-          </Reanimated.View>
-        </Container>
-      </Reanimated.View>
-    </TapGestureHandler>
+    <GestureHandlerRootView>
+      <TapGestureHandler
+        onGestureEvent={tapGestureHandler}
+        shouldCancelWhenOutside
+        enabled={!disabled}
+      >
+        <Reanimated.View>
+          <Container onGestureEvent={longPressGestureHandler} shouldCancelWhenOutside>
+            <Reanimated.View
+              {...others}
+              ref={forwardedRef}
+              style={[
+                borderRadius && { borderRadius },
+                flexStyle,
+                paddings,
+                margins,
+                alignments,
+                { backgroundColor },
+                style,
+                animatedStyle
+              ]}
+            >
+              {children}
+            </Reanimated.View>
+          </Container>
+        </Reanimated.View>
+      </TapGestureHandler>
+    </GestureHandlerRootView>
   );
 }
 
