@@ -254,3 +254,6 @@ index.ios.js
 !*.d.ts
 
 !testkit/*.ts
+
+!src/native/v1/*.ts
+!src/native/v2/*.ts
