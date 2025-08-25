@@ -37,11 +37,12 @@ export enum Presets {
 
 export type ValidationMessagePositionType = `${ValidationMessagePosition}` | ValidationMessagePosition;
 
-export type Validator = Function | keyof typeof formValidators;
+export type Validator = ((value?: string) => boolean) | keyof typeof formValidators;
 
 export interface FieldStateProps extends InputProps {
   validateOnStart?: boolean;
   validateOnChange?: boolean;
+  validationDebounceTime?: number;
   validateOnBlur?: boolean;
   /**
    * Callback for when field validated and failed
@@ -66,6 +67,17 @@ export interface MandatoryIndication {
    * Whether to show a mandatory field indication.
    */
   showMandatoryIndication?: boolean;
+}
+
+export interface ClearButtonProps extends Pick<TextInputProps, 'testID' | 'onChangeText'> {
+  /**
+   * On clear button callback
+   */
+  onClear?: () => void;
+  /**
+   * The style of the clear button
+   */
+  clearButtonStyle?: StyleProp<ViewStyle>;
 }
 
 export interface LabelProps extends MandatoryIndication, Pick<ValidationMessageProps, 'enableErrors'> {
@@ -189,6 +201,7 @@ export type TextFieldProps = MarginModifiers &
   LabelProps &
   Omit<FloatingPlaceholderProps, 'testID'> &
   MandatoryIndication &
+  Omit<ClearButtonProps, 'testID' | 'onChangeText'> &
   // We're declaring these props explicitly here for react-docgen (which can't read hooks)
   // FieldStateProps &
   ValidationMessageProps &
@@ -214,10 +227,6 @@ export type TextFieldProps = MarginModifiers &
      */
     showClearButton?: boolean;
     /**
-     * On clear button callback
-     */
-    onClear?: () => void;
-    /**
      * Text to display under the input
      */
     helperText?: string;
@@ -241,6 +250,10 @@ export type TextFieldProps = MarginModifiers &
      * Should validate when the TextField value changes
      */
     validateOnChange?: boolean;
+    /**
+     * Add a debounce timeout when sending validateOnChange
+     */
+    validationDebounceTime?: number;
     /**
      * Should validate when losing focus of TextField
      */
@@ -282,10 +295,9 @@ export type TextFieldProps = MarginModifiers &
      */
     centered?: boolean;
     /**
-     * @deprecated
-     * Set an alignment fit for inline behavior (when rendered inside a row container)
-     */
-    inline?: boolean;
+     * Set the inner container to use flex behavior to resolve text overflow issues when using leading or trailing accessories
+     * This may cause flex issues when the field is inside a row container */
+    innerFlexBehavior?: boolean;
   };
 
 export type InternalTextFieldProps = PropsWithChildren<

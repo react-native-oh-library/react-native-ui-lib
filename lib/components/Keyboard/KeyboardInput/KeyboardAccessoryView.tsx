@@ -95,7 +95,7 @@ class KeyboardAccessoryView extends Component<KeyboardAccessoryViewProps> {
       this.customInputControllerEventsSubscriber.remove();
     }
     if (IsAndroid) {
-      BackHandler.removeEventListener('hardwareBackPress', this.onAndroidBackPressed);
+      // BackHandler.removeEventListener('hardwareBackPress', this.onAndroidBackPressed);
     }
   }
 

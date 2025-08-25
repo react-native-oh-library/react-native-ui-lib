@@ -7,9 +7,10 @@ const sourceDir = path.join(__dirname, '../lib/components/DynamicFonts');
 // 目标目录（库 B）
 const targetDir = path.join(__dirname, '../../../react-native-ui-lib/lib/components/DynamicFonts');
 
+const targetUilibDir = path.join(__dirname, '../../../uilib-native/components/DynamicFonts');
+
 // 文件列表
 const filesToCopy = [
-  'PermissionsAcquirer.harmony.d.js',
   'PermissionsAcquirer.harmony.d.ts',
   'PermissionsAcquirer.harmony.js'
 ];
@@ -19,14 +20,20 @@ if (!fs.existsSync(targetDir)) {
   fs.mkdirSync(targetDir, { recursive: true });
 }
 
+if (!fs.existsSync(targetUilibDir)) {
+  fs.mkdirSync(targetUilibDir, { recursive: true });
+}
+
 // 复制文件函数
 async function copyFiles() {
   for (const file of filesToCopy) {
     const sourceFile = path.join(sourceDir, file);
     const targetFile = path.join(targetDir, file);
-
+    const targetUilibFile = path.join(targetUilibDir, file);
+     
     try {
       await fs.promises.copyFile(sourceFile, targetFile);
+      await fs.promises.copyFile(sourceFile, targetUilibFile);
     } catch (err) {
       process.exit(1); // 退出并返回错误代码
     }

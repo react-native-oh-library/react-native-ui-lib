@@ -157,7 +157,14 @@ export class Colors {
     }
   }
 
+  getColor(colorKey: string, schemeType?: Exclude<SchemeType, 'default'>) {
+    return Scheme.getScheme(schemeType)[colorKey];
+  }
+
   getColorName(colorValue: string) {
+    if (this.isTransparent(colorValue)) {
+      return 'transparent';
+    }
     const color = colorStringValue(colorValue);
     return ColorName.name(color)[1];
   }

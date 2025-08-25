@@ -1,7 +1,6 @@
 import React, { PropsWithChildren, useCallback, useMemo } from 'react';
 import { LayoutChangeEvent } from 'react-native';
 import Reanimated, {
-  useAnimatedGestureHandler,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
@@ -9,7 +8,7 @@ import Reanimated, {
   interpolateColor,
   runOnJS
 } from 'react-native-reanimated';
-import { GestureHandlerRootView, TapGestureHandler, LongPressGestureHandler, State } from 'react-native-gesture-handler';
+import { GestureHandlerRootView, TapGestureHandler, LongPressGestureHandler, State, gestureHandlerRootHOC } from 'react-native-gesture-handler';
 import { asBaseComponent, forwardRef, BaseComponentInjectedProps, ForwardRefInjectedProps } from '../commons/new';
 import View, { ViewProps } from '../components/view';
 import { Colors } from '../../src/style';
@@ -104,35 +103,41 @@ function TouchableOpacity(props: Props) {
     isActive.value = withTiming(value, { duration: 200 });
   };
 
-  const tapGestureHandler = useAnimatedGestureHandler({
-    onStart: () => {
-      toggleActive(1);
-    },
-    onEnd: () => {
-      toggleActive(0);
-      runOnJS(onPress)();
-    },
-    onFail: () => {
-      if (!isLongPressed.value) {
+  const tapGestureHandler = ({nativeEvent: {state}}: any) => {
+    switch (state) {
+      case State.BEGAN:
+        toggleActive(1);
+        break;
+      case State.CANCELLED:
+      case State.END:
         toggleActive(0);
-      }
+        runOnJS(onPress)();
+        break;
+      case State.FAILED:
+        if (!isLongPressed.value) {
+          toggleActive(0);
+        }
+        break;
     }
-  });
+  };
 
-  const longPressGestureHandler = useAnimatedGestureHandler({
-    onActive: () => {
-      if (!isLongPressed.value) {
-        isLongPressed.value = true;
-        runOnJS(onLongPress)();
-      }
-    },
-    onFinish: () => {
-      toggleActive(0);
-      isLongPressed.value = false;
+  const longPressGestureHandler = ({nativeEvent: {state}}: any) => {
+    switch (state) {
+      case State.ACTIVE:
+        if (!isLongPressed.value) {
+          isLongPressed.value = true;
+          runOnJS(onLongPress)();
+        }
+        break;
+      case State.CANCELLED:
+      case State.END:
+      case State.FAILED:
+        toggleActive(0);
+        isLongPressed.value = false;
+        break;
     }
-  });
+  };
 
-  // @ts-expect-error should be fixed in version 3.5 (https://github.com/software-mansion/react-native-reanimated/pull/4881)
   const animatedStyle = useAnimatedStyle(() => {
     const activeColor = feedbackColor || backgroundColor;
     const opacity = interpolate(isActive.value, [0, 1], [1, activeOpacity]);
@@ -152,30 +157,30 @@ function TouchableOpacity(props: Props) {
   return (
     <GestureHandlerRootView>
       <TapGestureHandler
-        onGestureEvent={tapGestureHandler}
-        shouldCancelWhenOutside
-        enabled={!disabled}
-      >
-        <Reanimated.View>
-          <Container onGestureEvent={longPressGestureHandler} shouldCancelWhenOutside>
-            <Reanimated.View
-              {...others}
-              ref={forwardedRef}
-              style={[
-                borderRadius && { borderRadius },
-                flexStyle,
-                paddings,
-                margins,
-                alignments,
-                { backgroundColor },
-                style,
-                animatedStyle
-              ]}
-            >
-              {children}
-            </Reanimated.View>
-          </Container>
-        </Reanimated.View>
+      onHandlerStateChange={tapGestureHandler}
+      shouldCancelWhenOutside
+      enabled={!disabled}
+    >
+      <Reanimated.View>
+        <Container onHandlerStateChange={longPressGestureHandler} shouldCancelWhenOutside>
+          <Reanimated.View
+            {...others}
+            ref={forwardedRef}
+            style={[
+              borderRadius && {borderRadius},
+              flexStyle,
+              paddings,
+              margins,
+              alignments,
+              {backgroundColor},
+              style,
+              animatedStyle
+            ]}
+          >
+            {children}
+          </Reanimated.View>
+        </Container>
+      </Reanimated.View>
       </TapGestureHandler>
     </GestureHandlerRootView>
   );
@@ -183,4 +188,4 @@ function TouchableOpacity(props: Props) {
 
 TouchableOpacity.displayName = 'Incubator.TouchableOpacity';
 
-export default asBaseComponent<TouchableOpacityProps>(forwardRef<Props>(TouchableOpacity));
+export default asBaseComponent<TouchableOpacityProps>(forwardRef<Props>(gestureHandlerRootHOC(TouchableOpacity)));

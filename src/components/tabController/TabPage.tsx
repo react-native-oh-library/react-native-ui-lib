@@ -44,7 +44,7 @@ export default function TabPage({
   lazyLoadTime = 100,
   ...props
 }: PropsWithChildren<TabControllerPageProps>) {
-  const {currentPage, asCarousel, containerWidth} = useContext(TabBarContext);
+  const {currentPage, asCarousel, nestedInScrollView, containerWidth} = useContext(TabBarContext);
   const [shouldLoad, setLoaded] = useState(!lazy);
   // const [focused, setFocused] = useState(false);
 
@@ -80,10 +80,18 @@ export default function TabPage({
 
   const animatedPageStyle = useAnimatedStyle(() => {
     const isActive = Math.round(currentPage.value) === index;
-    return {
+
+    // TODO: Fix to proper animated style once Reanimated export AnimatedStyleProp
+    const style: any = {
       opacity: isActive || asCarousel ? 1 : 0,
       zIndex: isActive || asCarousel ? 1 : 0
     };
+
+    if (nestedInScrollView) {
+      style.position = isActive ? 'relative' : 'absolute';
+    }
+
+    return style;
   });
 
   const _style = useMemo(() => {

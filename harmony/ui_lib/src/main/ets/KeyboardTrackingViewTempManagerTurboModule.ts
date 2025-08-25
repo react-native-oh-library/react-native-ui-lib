@@ -23,7 +23,7 @@
  */
 
 import { TurboModule, TurboModuleContext } from '@rnoh/react-native-openharmony/ts';
-import { TM } from "@rnoh/react-native-openharmony/generated/ts"
+import { TM } from "./generated/ts"
 
 
 export class KeyboardTrackingViewTempManager extends TurboModule implements TM.KeyboardTrackingViewTempManager.Spec {

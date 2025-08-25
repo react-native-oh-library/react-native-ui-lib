@@ -28,6 +28,13 @@ interface ThumbProps extends ViewProps {
 
 const SHADOW_RADIUS = 4;
 const THUMB_SIZE = 24;
+const THUMB_ACCESSIBLE_HITSLOP = Math.max(0, 48 - THUMB_SIZE) / 2;
+const DEFAULT_THUMB_HIT_SLOP = {
+  top: THUMB_ACCESSIBLE_HITSLOP,
+  bottom: THUMB_ACCESSIBLE_HITSLOP,
+  left: THUMB_ACCESSIBLE_HITSLOP,
+  right: THUMB_ACCESSIBLE_HITSLOP
+} as const;
 
 const Thumb = (props: ThumbProps) => {
   const {
@@ -35,7 +42,7 @@ const Thumb = (props: ThumbProps) => {
     disableActiveStyling,
     activeStyle,
     defaultStyle,
-    hitSlop,
+    hitSlop = DEFAULT_THUMB_HIT_SLOP,
     onSeekStart,
     onSeekEnd,
     start,
@@ -87,7 +94,6 @@ const Thumb = (props: ThumbProps) => {
     });
   gesture.enabled(!disabled);
 
-  // @ts-expect-error should be fixed in version 3.5 (https://github.com/software-mansion/react-native-reanimated/pull/4881)
   const animatedStyle = useAnimatedStyle(() => {
     const customStyle = isPressed.value ? activeStyle?.value : defaultStyle?.value;
     return {
@@ -110,7 +116,6 @@ const Thumb = (props: ThumbProps) => {
     <GestureDetector gesture={gesture}>
       <View
         reanimated
-        // @ts-expect-error should be fixed in version 3.5 (https://github.com/software-mansion/react-native-reanimated/pull/4881)
         style={[styles.thumbPosition, enableShadow && styles.thumbShadow, animatedStyle]}
         hitSlop={hitSlop}
         onLayout={onThumbLayout}

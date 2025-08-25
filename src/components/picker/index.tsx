@@ -3,7 +3,7 @@
 // TODO: consider deprecating renderCustomModal prop
 import _ from 'lodash';
 import React, {useMemo, useState, useRef, useCallback, useEffect} from 'react';
-import {LayoutChangeEvent} from 'react-native';
+import {DimensionValue, LayoutChangeEvent} from 'react-native';
 import {useThemeProps} from 'hooks';
 import {Constants} from '../../commons/new';
 import ExpandableOverlay, {ExpandableOverlayProps, ExpandableOverlayMethods} from '../../incubator/expandableOverlay';
@@ -28,13 +28,14 @@ import {
   PickerSearchStyle,
   RenderCustomModalProps,
   PickerItemsListProps,
-  PickerMethods
+  PickerMethods,
+  PickerSelectionStatusProps
 } from './types';
+import {DialogProps} from '../../incubator/dialog';
 
-const DIALOG_PROPS = {
+const DEFAULT_DIALOG_PROPS: DialogProps = {
   bottom: true,
-  width: '100%',
-  height: 250
+  width: '100%' as DimensionValue
 };
 
 type PickerStatics = {
@@ -47,7 +48,7 @@ type PickerStatics = {
 const Picker = React.forwardRef((props: PickerProps, ref) => {
   const themeProps = useThemeProps(props, 'Picker');
   const {
-    mode,
+    mode = PickerModes.SINGLE,
     fieldType = PickerFieldTypes.form,
     selectionLimit,
     showSearch,
@@ -76,6 +77,10 @@ const Picker = React.forwardRef((props: PickerProps, ref) => {
     accessibilityLabel,
     accessibilityHint,
     items: propItems,
+    showLoader,
+    customLoaderElement,
+    renderCustomTopElement,
+    selectionStatus,
     ...others
   } = themeProps;
   const {preset, placeholder, style, trailingAccessory, label: propsLabel} = others;
@@ -84,10 +89,10 @@ const Picker = React.forwardRef((props: PickerProps, ref) => {
   const [items, setItems] = useState<PickerItemProps[]>(propItems || extractPickerItems(themeProps));
   const pickerExpandable = useRef<ExpandableOverlayMethods>(null);
   const pickerRef = useImperativePickerHandle(ref, pickerExpandable);
-  
+
   // TODO: Remove this when migration is completed, starting of v8
   // usePickerMigrationWarnings({children, migrate, getItemLabel, getItemValue});
-  
+
   useEffect(() => {
     if (propItems) {
       setItems(propItems);
@@ -95,12 +100,19 @@ const Picker = React.forwardRef((props: PickerProps, ref) => {
   }, [propItems]);
 
   const {
-    filteredChildren,
+    filteredItems,
     setSearchValue,
     onSearchChange: _onSearchChange
-  } = usePickerSearch({showSearch, onSearchChange, getItemLabel, children});
-  
-  const {multiDraftValue, onDoneSelecting, toggleItemSelection, cancelSelect} = usePickerSelection({
+  } = usePickerSearch({showSearch, onSearchChange, getItemLabel, children, items});
+  const {
+    multiDraftValue,
+    onDoneSelecting,
+    toggleItemSelection,
+    cancelSelect,
+    areAllItemsSelected,
+    selectedCount,
+    toggleAllItemsSelection
+  } = usePickerSelection({
     migrate,
     value,
     onChange,
@@ -108,8 +120,20 @@ const Picker = React.forwardRef((props: PickerProps, ref) => {
     getItemValue,
     topBarProps,
     setSearchValue,
-    mode
+    mode,
+    items
   });
+
+  const accessibleFilteredItems = useMemo(() => {
+    if (propItems) {
+      return filteredItems.map((item: PickerItemProps) => ({
+        ...item,
+        onPress: useWheelPicker && Constants.accessibility.isScreenReaderEnabled ?
+          () => onDoneSelecting(item.value) : undefined
+      }));
+    }
+    return filteredItems;
+  }, [propItems, useWheelPicker, filteredItems, onDoneSelecting]);
 
   const {label, accessibilityInfo} = usePickerLabel({
     value,
@@ -150,7 +174,10 @@ const Picker = React.forwardRef((props: PickerProps, ref) => {
       getItemLabel,
       onSelectedLayout: onSelectedItemLayout,
       renderItem,
-      selectionLimit
+      selectionLimit,
+      areAllItemsSelected,
+      selectedCount,
+      toggleAllItemsSelection
     };
   }, [
     migrate,
@@ -163,7 +190,10 @@ const Picker = React.forwardRef((props: PickerProps, ref) => {
     selectionLimit,
     onSelectedItemLayout,
     toggleItemSelection,
-    onDoneSelecting
+    onDoneSelecting,
+    areAllItemsSelected,
+    selectedCount,
+    toggleAllItemsSelection
   ]);
 
   const renderPickerItem = useCallback((item: PickerItemProps, index: number): React.ReactElement => {
@@ -228,7 +258,7 @@ const Picker = React.forwardRef((props: PickerProps, ref) => {
         useWheelPicker={useWheelPicker}
         mode={mode}
         useDialog={useDialog}
-        items={useItems ? items : undefined}
+        items={useItems ? accessibleFilteredItems : undefined}
         topBarProps={{
           ...topBarProps,
           onCancel: cancelSelect,
@@ -242,8 +272,12 @@ const Picker = React.forwardRef((props: PickerProps, ref) => {
         renderHeader={renderHeader}
         listProps={listProps}
         useSafeArea={useSafeArea}
+        showLoader={showLoader}
+        customLoaderElement={customLoaderElement}
+        renderCustomTopElement={renderCustomTopElement}
+        selectionStatus={selectionStatus}
       >
-        {filteredChildren}
+        {accessibleFilteredItems}
       </PickerItemsList>
     );
   }, [
@@ -262,10 +296,11 @@ const Picker = React.forwardRef((props: PickerProps, ref) => {
     renderCustomSearch,
     renderHeader,
     listProps,
-    filteredChildren,
+    accessibleFilteredItems,
     useSafeArea,
     useWheelPicker,
-    items
+    items,
+    showLoader
   ]);
 
   return (
@@ -274,7 +309,8 @@ const Picker = React.forwardRef((props: PickerProps, ref) => {
         <ExpandableOverlay
           ref={pickerExpandable}
           useDialog={useDialog || useWheelPicker}
-          dialogProps={DIALOG_PROPS}
+          dialogProps={DEFAULT_DIALOG_PROPS}
+          migrateDialog
           expandableContent={expandableModalContent}
           renderCustomOverlay={renderOverlay ? _renderOverlay : undefined}
           onPress={onPress}
@@ -291,9 +327,7 @@ const Picker = React.forwardRef((props: PickerProps, ref) => {
 
 // @ts-expect-error
 Picker.Item = PickerItem;
-Picker.defaultProps = {
-  mode: PickerModes.SINGLE
-};
+
 Picker.displayName = 'Picker';
 // @ts-expect-error
 Picker.modes = PickerModes;
@@ -311,7 +345,8 @@ export {
   PickerSearchStyle,
   RenderCustomModalProps,
   PickerItemsListProps,
-  PickerMethods
+  PickerMethods,
+  PickerSelectionStatusProps
 };
 export {Picker}; // For tests
 export default Picker as typeof Picker & PickerStatics;

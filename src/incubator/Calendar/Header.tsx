@@ -10,7 +10,11 @@ import {HeaderProps, DayNamesFormat, UpdateSource} from './types';
 import CalendarContext from './CalendarContext';
 import WeekDaysNames from './WeekDaysNames';
 
+// Note: this fixes the updates on the header month title
+Reanimated.addWhitelistedNativeProps({text: true});
 
+const ARROWS_THROTTLE_TIME = 300;
+const ARROWS_THROTTLE_OPTIONS = {leading: true, trailing: false};
 const WEEK_NUMBER_WIDTH = 32;
 const ARROW_NEXT = require('./assets/arrowNext.png');
 const ARROW_BACK = require('./assets/arrowBack.png');
@@ -28,11 +32,13 @@ const Header = (props: HeaderProps) => {
 
   const onLeftArrowPress = useCallback(throttle(() => {
     setDate(getNewDate(-1), UpdateSource.MONTH_ARROW);
-  }, 300), [setDate, getNewDate]);
+  }, ARROWS_THROTTLE_TIME, ARROWS_THROTTLE_OPTIONS),
+  [setDate, getNewDate]);
 
   const onRightArrowPress = useCallback(throttle(() => {
     setDate(getNewDate(1), UpdateSource.MONTH_ARROW);
-  }, 300), [setDate, getNewDate]);
+  }, ARROWS_THROTTLE_TIME, ARROWS_THROTTLE_OPTIONS),
+  [setDate, getNewDate]);
 
   const getTitle = useCallback((date: number) => {
     'worklet';
@@ -42,7 +48,8 @@ const Header = (props: HeaderProps) => {
     return getMonthForIndex(m) + ` ${y}`;
   }, []);
 
-  const animatedProps = useAnimatedProps(() => { // get called only on value update
+  const animatedProps = useAnimatedProps(() => {
+    // get called only on value update
     return {
       text: getTitle(selectedDate.value)
     };
@@ -50,7 +57,8 @@ const Header = (props: HeaderProps) => {
 
   const onLayout = useCallback((event: LayoutChangeEvent) => {
     setHeaderHeight?.(event.nativeEvent.layout.height);
-  }, [setHeaderHeight]);
+  },
+  [setHeaderHeight]);
 
   const renderTitle = () => {
     if (!staticHeader) {
@@ -58,24 +66,18 @@ const Header = (props: HeaderProps) => {
       return <Text style={styles.title}>{title}</Text>;
     }
     return (
-      <AnimatedTextInput 
+      //@ts-expect-error - hack to animate the title text change
+      <AnimatedTextInput
         value={getTitle(selectedDate.value)} // setting initial value
         {...{animatedProps}}
         editable={false}
-        // @ts-expect-error should be fixed in version 3.5 (https://github.com/software-mansion/react-native-reanimated/pull/4881)
         style={styles.title}
-      />);
+      />
+    );
   };
 
   const renderArrow = (source: number, onPress: () => void) => {
-    return (
-      <Button
-        link
-        size={Button.sizes.xSmall}
-        iconSource={source}
-        onPress={onPress}
-      />
-    );
+    return <Button link size={Button.sizes.xSmall} iconSource={source} onPress={onPress}/>;
   };
 
   const renderNavigation = () => {

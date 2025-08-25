@@ -3,7 +3,7 @@
         "Name": "react-native-ui-lib",
         "License": "MIT",
         "License File": "https://github.com/wix/react-native-ui-lib/blob/master/LICENSE",
-        "Version Number": "7.29.1",
+        "Version Number": "7.43.0",
         "Owner" : "xiafeng@huawei.com",
         "Upstream URL": "https://github.com/wix/react-native-ui-lib",
         "Description": "react native ui lib"

@@ -13,7 +13,11 @@ type Props = KeyboardTrackingViewProps & {
  */
 const KeyboardAwareInsetsView = (props: Props) => {
   const {offset = 0.5, ...others} = props;
-  return <KeyboardTrackingView {...others} pointerEvents={'none'} style={[styles.insetsView, {height: offset}]} scrollToFocusedInput/>;
+  const combinedStyle = {
+    ...styles.insetsView,
+    height: offset
+  };
+  return <KeyboardTrackingView {...others} pointerEvents={'none'} style={combinedStyle} scrollToFocusedInput/>;
 };
 
 const ScreenSize = Dimensions.get('window');

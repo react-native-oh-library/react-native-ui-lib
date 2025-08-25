@@ -8,19 +8,21 @@ import React, {
   forwardRef,
   ForwardedRef
 } from 'react';
-import {StyleProp, StyleSheet, ViewStyle, Platform} from 'react-native';
+import {DimensionValue, StyleProp, StyleSheet, ViewStyle, Platform} from 'react-native';
 import {DateTimePickerPackage as RNDateTimePicker} from '../../optionalDependencies';
 import {useDidUpdate} from '../../hooks';
 import {Colors} from '../../style';
 import Assets from '../../assets';
 import {Constants, asBaseComponent, BaseComponentInjectedProps} from '../../commons/new';
 import TextField, {TextFieldProps, TextFieldMethods} from '../textField';
-import type {DialogMigrationProps} from '../../incubator/Dialog';
+import type {DialogMigrationProps} from '../../incubator/dialog';
 import {DialogProps} from '../dialog';
 import View from '../view';
 import Button, {ButtonProps} from '../button';
 import ExpandableOverlay, {ExpandableOverlayMethods, RenderCustomOverlayProps} from '../../incubator/expandableOverlay';
 import useOldApi, {OldApiProps} from './useOldApi';
+import {isSameDate, isSameHourAndMinute} from '../../utils/dateUtils';
+import {LogService} from 'services';
 
 export type DateTimePickerMode = 'date' | 'time';
 
@@ -94,6 +96,14 @@ export type DateTimePickerProps = OldApiProps &
      */
     display?: string;
     /**
+     * Text color of the wheel picker items
+     */
+    textColor?: string;
+    /**
+     * Background color of the wheel picker
+     */
+    backgroundColor?: string;
+    /**
      * Confirm button props
      */
     confirmButtonProps?: ButtonProps;
@@ -136,6 +146,8 @@ const DateTimePicker = forwardRef((props: DateTimePickerPropsInternal, ref: Forw
     onChange,
     dialogProps,
     migrateDialog,
+    textColor = Colors.$textDefault,
+    backgroundColor = Colors.$backgroundDefault,
     headerStyle,
     testID,
     display = Constants.isIOS ? 'spinner' : undefined,
@@ -159,7 +171,7 @@ const DateTimePicker = forwardRef((props: DateTimePickerPropsInternal, ref: Forw
   useEffect(() => {
     if (!RNDateTimePicker) {
       // eslint-disable-next-line max-len
-      console.error(`RNUILib DateTimePicker component requires installing "@react-native-community/datetimepicker" dependency`);
+      LogService.error(`RNUILib DateTimePicker component requires installing "@react-native-community/datetimepicker" dependency`);
     }
   }, []);
 
@@ -169,7 +181,7 @@ const DateTimePicker = forwardRef((props: DateTimePickerPropsInternal, ref: Forw
 
   const _dialogProps = useMemo(() => {
     return {
-      width: '100%',
+      width: '100%' as DimensionValue,
       height: null,
       bottom: true,
       centerH: true,
@@ -184,6 +196,10 @@ const DateTimePicker = forwardRef((props: DateTimePickerPropsInternal, ref: Forw
       ...dialogProps
     };
   }, [dialogProps, testID]);
+
+  const dateTimePickerStyle = useMemo(() => {
+    return {backgroundColor};
+  }, [backgroundColor]);
 
   const {getStringValue: getStringValueOld} = useOldApi({dateFormat, dateFormatter, timeFormat, timeFormatter});
 
@@ -203,16 +219,21 @@ const DateTimePicker = forwardRef((props: DateTimePickerPropsInternal, ref: Forw
     expandable.current?.toggleExpandable?.();
   }, []);
 
+  const isValueChanged = useCallback(() => {
+    return mode === 'time' ? !isSameHourAndMinute(chosenDate.current, value) : !isSameDate(chosenDate.current, value);
+  }, [mode, value]);
+
   const onDonePressed = useCallback(() => {
     toggleExpandableOverlay();
     if (Constants.isIOS && !chosenDate.current) {
       // since handleChange() is not called on iOS when there is no actual change
       chosenDate.current = new Date();
     }
-
-    onChange?.(chosenDate.current!);
+    if (chosenDate.current && isValueChanged()) {
+      onChange?.(chosenDate?.current);
+    }
     setValue(chosenDate.current);
-  }, [toggleExpandableOverlay, onChange]);
+  }, [toggleExpandableOverlay, onChange, isValueChanged]);
 
   const handleChange = useCallback((event: any = {}, date: Date) => {
     // NOTE: will be called on Android even when there was no actual change
@@ -234,13 +255,14 @@ const DateTimePicker = forwardRef((props: DateTimePickerPropsInternal, ref: Forw
         row
         spread
         bg-$backgroundDefault
+        backgroundColor={backgroundColor}
         paddingH-20
         style={[styles.header, headerStyle]}
         testID={`${testID}.header`}
       >
         <Button
           link
-          iconSource={Assets.icons.x}
+          iconSource={Assets.internal.icons.x}
           iconStyle={{tintColor: Colors.$iconDefault}}
           testID={`${testID}.cancel`}
           {...cancelButtonProps}
@@ -248,7 +270,7 @@ const DateTimePicker = forwardRef((props: DateTimePickerPropsInternal, ref: Forw
         />
         <Button
           link
-          iconSource={Assets.icons.check}
+          iconSource={Assets.internal.icons.check}
           testID={`${testID}.done`}
           {...confirmButtonProps}
           onPress={onDonePressed}
@@ -265,7 +287,7 @@ const DateTimePicker = forwardRef((props: DateTimePickerPropsInternal, ref: Forw
     return (
       <RNDateTimePicker
         // harmony侧 @react-native-community/datetimepicker 父节点或组件需要设置宽高才进行展示
-        style={Platform.OS === 'harmony' ? { width: '100%', height: 240, backgroundColor: '#fff' } : {}}
+        style={Platform.OS as any === 'harmony' ? { width: '100%', height: 240, backgroundColor: '#fff', dateTimePickerStyle } : {}}
         mode={mode}
         value={value || new Date()}
         onChange={handleChange}
@@ -276,6 +298,7 @@ const DateTimePicker = forwardRef((props: DateTimePickerPropsInternal, ref: Forw
         minuteInterval={minuteInterval}
         timeZoneOffsetInMinutes={timeZoneOffsetInMinutes}
         display={display}
+        textColor={textColor}
         themeVariant={themeVariant}
         testID={`${testID}.picker`}
       />

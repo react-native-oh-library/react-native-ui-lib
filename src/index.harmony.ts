@@ -3,7 +3,7 @@ export {default as Assets} from './assets';
 export type {emojis as EmojisAssetsType} from './assets/emojis';
 export * from './style';
 export * from './services';
-export * from '../lib/components';
+export * from 'uilib-native';
 export {
   asBaseComponent,
   Config,
@@ -121,8 +121,10 @@ export {
   PickerSearchStyle,
   RenderCustomModalProps,
   PickerItemsListProps,
-  PickerMethods
+  PickerMethods,
+  PickerSelectionStatusProps
 } from './components/picker';
+export {default as PieChart, type PieChartProps, PieChartSegmentProps} from './components/pieChart';
 export {default as ProgressBar, ProgressBarProps} from './components/progressBar';
 export {default as ProgressiveImage, ProgressiveImageProps} from './components/progressiveImage';
 export {default as RadioButton, RadioButtonProps} from './components/radioButton';
@@ -130,11 +132,13 @@ export {default as RadioGroup, RadioGroupProps} from './components/radioGroup';
 export type {RecorderProps} from './typings/recorderTypes';
 export type {ComponentStatics} from './typings/common';
 export {default as ScrollBar, ScrollBarProps} from './components/scrollBar';
+export {default as SearchInput, SearchInputProps, SearchInputRef} from './components/searchInput';
 export {default as SectionsWheelPicker, SectionsWheelPickerProps} from './components/sectionsWheelPicker';
 export {
   default as SegmentedControl,
   SegmentedControlProps,
-  SegmentedControlItemProps
+  SegmentedControlItemProps,
+  SegmentedControlPreset
 } from './components/segmentedControl';
 // @ts-expect-error
 export {default as SharedTransition} from './components/sharedTransition';
@@ -143,7 +147,7 @@ export {default as SortableGridList, SortableGridListProps} from './components/s
 export {default as SortableList, SortableListProps, SortableListItemProps} from './components/sortableList';
 export {default as StackAggregator, StackAggregatorProps} from './components/stackAggregator';
 export {default as StateScreen, StateScreenProps} from './components/stateScreen';
-export {default as Stepper, StepperProps} from './components/stepper';
+export {default as Stepper, StepperProps, StepperType} from './components/stepper';
 export {default as Switch, SwitchProps} from './components/switch';
 export {
   default as TabController,

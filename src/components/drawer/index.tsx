@@ -2,7 +2,7 @@ import _ from 'lodash';
 import React, {PureComponent, ReactNode, RefObject} from 'react';
 import memoize from 'memoize-one';
 import {Animated, Easing, StyleSheet, ViewStyle, TextStyle, AccessibilityActionEvent} from 'react-native';
-import {RectButton} from 'react-native-gesture-handler';
+import {RectButton, GestureHandlerRootView} from 'react-native-gesture-handler';
 import {Constants, asBaseComponent} from '../../commons/new';
 import {extractAccessibilityProps} from '../../commons/modifiers';
 import {Colors} from '../../style';
@@ -16,7 +16,9 @@ interface DrawerItemProps {
   width?: number;
   background?: string;
   text?: string;
+  textColor?: string;
   icon?: number;
+  iconColor?: string;
   onPress?: Function;
   keepOpen?: boolean;
   style?: ViewStyle;
@@ -126,8 +128,6 @@ interface DrawerProps {
 
 /**
  * @description: Drawer Component
- * @important: If your app works with RNN, your screen must be wrapped
- * with gestureHandlerRootHOC from 'react-native-gesture-handler'. see
  * @importantLink: https://docs.swmansion.com/react-native-gesture-handler/docs/installation/
  * @gif: https://github.com/wix/react-native-ui-lib/blob/master/demo/showcase/Drawer/Drawer.gif?raw=true
  */
@@ -349,7 +349,7 @@ class Drawer extends PureComponent<DrawerProps> {
               {
                 width: itemsIconSize,
                 height: itemsIconSize,
-                tintColor: itemsTintColor,
+                tintColor: item.iconColor || itemsTintColor,
                 opacity,
                 transform: [{scale}]
               }
@@ -361,7 +361,7 @@ class Drawer extends PureComponent<DrawerProps> {
             style={[
               styles.actionText,
               {
-                color: itemsTintColor,
+                color: item.textColor || itemsTintColor,
                 opacity,
                 transform: [{scale}]
               },
@@ -382,29 +382,31 @@ class Drawer extends PureComponent<DrawerProps> {
     const {children, style, leftItem, rightItems, onToggleSwipeLeft, ...others} = this.props;
 
     return (
-      <Swipeable
-        {...others}
-        ref={this._swipeableRow}
-        friction={1}
-        containerStyle={style}
-        animationOptions={this.animationOptions}
-        renderLeftActions={this.leftRender}
-        renderRightActions={this.rightRender}
-        rightActionsContainerStyle={this.getRightActionsContainerStyle(rightItems, leftItem)}
-        leftActionsContainerStyle={this.getLeftActionsContainerStyle(leftItem, rightItems)}
-        onSwipeableWillOpen={this.onSwipeableWillOpen}
-        onSwipeableWillClose={this.onSwipeableWillClose}
-        onToggleSwipeLeft={onToggleSwipeLeft && this.onToggleSwipeLeft}
-      >
-        <View
-          accessible
-          accessibilityActions={this.getAccessibilityActions()}
-          onAccessibilityAction={this.onAccessibilityAction}
-          {...extractAccessibilityProps(this.props)}
+      <GestureHandlerRootView>
+        <Swipeable
+          {...others}
+          ref={this._swipeableRow}
+          friction={1}
+          containerStyle={style}
+          animationOptions={this.animationOptions}
+          renderLeftActions={this.leftRender}
+          renderRightActions={this.rightRender}
+          rightActionsContainerStyle={this.getRightActionsContainerStyle(rightItems, leftItem)}
+          leftActionsContainerStyle={this.getLeftActionsContainerStyle(leftItem, rightItems)}
+          onSwipeableWillOpen={this.onSwipeableWillOpen}
+          onSwipeableWillClose={this.onSwipeableWillClose}
+          onToggleSwipeLeft={onToggleSwipeLeft && this.onToggleSwipeLeft}
         >
-          {children}
-        </View>
-      </Swipeable>
+          <View
+            accessible
+            accessibilityActions={this.getAccessibilityActions()}
+            onAccessibilityAction={this.onAccessibilityAction}
+            {...extractAccessibilityProps(this.props)}
+          >
+            {children}
+          </View>
+        </Swipeable>
+      </GestureHandlerRootView>
     );
   }
 }

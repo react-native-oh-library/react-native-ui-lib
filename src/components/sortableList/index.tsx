@@ -84,7 +84,8 @@ const SortableList = <ItemT extends SortableListItemProps>(props: SortableListPr
       enableHaptic,
       scale
     };
-  }, [data]);
+  }, [data, onChange]);
+
   return (
     <GestureHandlerRootView style={flexMigration ? styles.container : undefined}>
       <SortableListContext.Provider value={context}>
@@ -103,7 +104,7 @@ const SortableList = <ItemT extends SortableListItemProps>(props: SortableListPr
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1
+    flexGrow: 1
   }
 });
 
