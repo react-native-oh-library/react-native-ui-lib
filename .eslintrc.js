@@ -8,10 +8,18 @@ module.exports = {
     'no-undef': 'off',
     /* Other Rules */
     'no-unused-expressions': 'off',
+    'no-restricted-syntax': [
+      'error',
+      {
+        selector: `CallExpression[callee.object.name='console'][callee.property.name='error']`,
+        message: 'Using console.error is not allowed as it is sent to Sentry, please use LogService.error instead'
+      }
+    ],
     'arrow-parens': 'off',
     // TODO: remove after migration of legacy lifecycle methods
     camelcase: 'off',
     'comma-dangle': ['error', 'never'],
+    complexity: ['warn', {max: 25}],
     'no-mixed-operators': ['off'],
     'no-trailing-spaces': 'off',
     'operator-linebreak': 'off',

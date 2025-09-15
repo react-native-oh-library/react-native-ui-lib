@@ -1,9 +1,9 @@
 import React from 'react';
 import {isSvg, isSvgUri} from '../../utils/imageUtils';
-import {SvgPackage} from '../../optionalDependencies';
+import {SvgPackage, SvgCssUri} from '../../optionalDependencies';
+import {LogService} from 'services';
 
 const SvgXml = SvgPackage?.SvgXml;
-const SvgCssUri = SvgPackage?.SvgCssUri;
 // const SvgProps = SvgPackage?.SvgProps; TODO: not sure how (or if) we can use their props
 
 export interface SvgImageProps {
@@ -21,7 +21,7 @@ function SvgImage(props: SvgImageProps) {
 
   if (!SvgXml) {
     // eslint-disable-next-line max-len
-    console.error(`RNUILib Image "svg" prop requires installing "react-native-svg" and "react-native-svg-transformer" dependencies`);
+    LogService.error(`RNUILib Image "svg" prop requires installing "react-native-svg" and "react-native-svg-transformer" dependencies`);
     return null;
   }
 

@@ -23,7 +23,7 @@ const PickerItem = (props: PickerItemProps) => {
     label,
     labelStyle,
     disabled,
-    selectedIcon = Assets.icons.check,
+    selectedIcon = Assets.internal.icons.check,
     selectedIconColor = Colors.$iconPrimary,
     onPress,
     testID
@@ -44,7 +44,7 @@ const PickerItem = (props: PickerItemProps) => {
 
   const isItemDisabled = useMemo(() => {
     return !!(disabled || (!isSelected && context.selectionLimit && context.selectionLimit === selectedCounter));
-  }, [selectedCounter]);
+  }, [selectedCounter, disabled]);
 
   useEffect(() => {
     if (_.isPlainObject(value)) {

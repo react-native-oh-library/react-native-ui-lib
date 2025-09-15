@@ -29,7 +29,7 @@ import {
   DescriptorWrapperFactoryByDescriptorTypeCtx
 } from '@rnoh/react-native-openharmony/ts';
 import type { TurboModule, TurboModuleContext, } from '@rnoh/react-native-openharmony/ts';
-import { RNC, TM } from "@rnoh/react-native-openharmony/generated/ts"
+import { RNC, TM } from "./generated/ts"
 import { KeyboardTrackingViewTempManager } from './KeyboardTrackingViewTempManagerTurboModule'
 import { KeyboardTrackingViewTempTurboModule } from './KeyboardTrackingViewTempTurboModule'
 import { CustomInputControllerTemp } from './CustomInputControllerTempTurboModule'

@@ -4,7 +4,9 @@ import {
   NativeModules,
   I18nManager,
   AccessibilityInfo,
-  AccessibilityChangeEvent
+  AccessibilityChangeEvent,
+  StatusBar,
+  PixelRatio
 } from 'react-native';
 
 export enum orientations {
@@ -22,7 +24,7 @@ function breakpointComparator(b1: Breakpoint, b2: Breakpoint) {
 }
 
 const isAndroid: boolean = Platform.OS === 'android';
-const isIOS: boolean = Platform.OS === 'ios' || Platform.OS === 'harmony';
+const isIOS: boolean = Platform.OS === 'ios' || (Platform.OS as any) === 'harmony';
 const isWeb: boolean = Platform.OS === 'web';
 let isTablet: boolean;
 let statusBarHeight: number;
@@ -34,17 +36,17 @@ let breakpoints: Breakpoint[];
 let defaultMargin = 0;
 
 const isSubWindow = windowWidth < screenWidth;
-//@ts-ignore
-isTablet = Platform.isPad || (getAspectRatio() < 1.6 && Math.max(screenWidth, screenHeight) >= 900);
+isTablet =
+  (Platform.OS === 'ios' && Platform.isPad) || (getAspectRatio() < 1.6 && Math.max(screenWidth, screenHeight) >= 900);
 
 function setStatusBarHeight() {
   const {StatusBarManager} = NativeModules;
-  statusBarHeight = StatusBarManager?.HEIGHT || 0; // So there will be a value for any case
-  // statusBarHeight = isIOS ? 20 : StatusBarManager.HEIGHT;
-  // if (isIOS) {
-  //   // override guesstimate height with the actual height from StatusBarManager
-  //   StatusBarManager.getHeight((data: any) => (statusBarHeight = data.height));
-  // }
+  statusBarHeight = (StatusBar.currentHeight ?? StatusBarManager?.HEIGHT) || 0;
+
+  if (isIOS && StatusBarManager) {
+    // override guesstimate height with the actual height from StatusBarManager
+    // StatusBarManager.getHeight((data:{height:number}) => (statusBarHeight = data.height));
+  }
 }
 
 function getAspectRatio() {
@@ -125,7 +127,7 @@ const constants = {
     return screenHeight <= 600;
   },
   get isWideScreen() {
-    return isTablet && !isSubWindow || this.isLandscape;
+    return (isTablet && !isSubWindow) || this.isLandscape;
   },
   get screenAspectRatio() {
     return getAspectRatio();
@@ -189,7 +191,10 @@ const constants = {
   },
   /* Keyboard */
   backspaceKey: 'Backspace',
-  enterKey: 'Enter'
+  enterKey: 'Enter',
+
+  /* Font scale */
+  getFontScale: PixelRatio.getFontScale
 };
 
 setStatusBarHeight();

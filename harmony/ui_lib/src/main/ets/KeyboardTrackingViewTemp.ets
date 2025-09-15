@@ -23,7 +23,7 @@
  */
 
 import { Descriptor, RNComponentContext, RNOHLogger, RNViewBase, ViewRawProps, ViewBaseProps } from '@rnoh/react-native-openharmony';
-import { RNC } from "@rnoh/react-native-openharmony/generated"
+import { RNC } from './generated';
 
 interface KeyboardTrackingViewTempProps extends ViewRawProps {
   text?: string

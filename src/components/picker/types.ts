@@ -4,6 +4,8 @@ import {ExpandableOverlayProps, ExpandableOverlayMethods} from '../../incubator/
 import {ModalTopBarProps} from '../modal/TopBar';
 import {TextFieldMethods, TextFieldProps} from '../textField';
 import {TouchableOpacityProps} from '../touchableOpacity';
+import {ButtonProps} from '../button';
+import {CheckboxProps} from '../checkbox';
 
 // Note: enum values are uppercase due to legacy
 export enum PickerModes {
@@ -23,6 +25,7 @@ export enum PickerFieldTypes {
 export type PickerSingleValue = string | number;
 export type PickerMultiValue = PickerSingleValue[];
 export type PickerValue = PickerSingleValue | PickerMultiValue | undefined;
+type PickerFilteredItems = ReactNode | Pick<PickerItemProps, 'label' | 'value' | 'disabled'>[] | undefined;
 
 type RenderPickerOverloads<ValueType> = ValueType extends PickerValue
   ? (value?: ValueType, label?: string) => React.ReactElement
@@ -117,7 +120,7 @@ type PickerSearchProps = {
   /**
    * callback for picker modal search input text change (only when passing showSearch)
    */
-  onSearchChange?: (searchValue: string, filteredChildren?: ReactNode | undefined) => void;
+  onSearchChange?: (searchValue: string, filteredItems?: PickerFilteredItems) => void;
   /**
    * Render custom search input (only when passing showSearch)
    */
@@ -157,6 +160,48 @@ type PickerExpandableOverlayProps = {
    */
   enableModalBlur?: boolean;
 };
+
+interface PickerSelectionStatusLabelData {
+  selectedCount: number;
+  areAllItemsSelected: boolean;
+}
+
+export type ButtonSelectionStatus = {
+  /**
+   * Select all element type
+   */
+  selectAllType?: 'button';
+  /**
+   * Button props
+   */
+  buttonProps?: ButtonProps;
+};
+
+export type CheckboxSelectionStatus = {
+  /**
+   * Select all element type
+   */
+  selectAllType?: 'checkbox';
+  /**
+   * Checkbox props
+   */
+  checkboxProps?: CheckboxProps;
+};
+
+export type PickerSelectionStatusProps = {
+  /**
+   * A function that generates a label based on the selected items' count and status
+   */
+  getLabel?: (data: PickerSelectionStatusLabelData) => string;
+  /**
+   * Custom container style
+   */
+  containerStyle?: StyleProp<ViewStyle>;
+  /**
+   * Control weather to show the label or not
+   */
+  showLabel?: boolean;
+} & (ButtonSelectionStatus | CheckboxSelectionStatus);
 
 export type PickerBaseProps = Omit<TextFieldProps, 'value' | 'onChange'> &
   PickerPropsDeprecation &
@@ -206,6 +251,14 @@ export type PickerBaseProps = Omit<TextFieldProps, 'value' | 'onChange'> &
       label?: string
     ) => React.ReactElement;
     /**
+     * Render custom top element
+     */
+    renderCustomTopElement?: (value?: PickerValue) => React.ReactElement;
+    /**
+     * Selection status bar props
+     */
+    selectionStatus?: PickerSelectionStatusProps;
+    /**
      * Add onPress callback for when pressing the picker
      */
     onPress?: () => void;
@@ -225,6 +278,14 @@ export type PickerBaseProps = Omit<TextFieldProps, 'value' | 'onChange'> &
      * Component test id
      */
     testID?: string;
+    /**
+     * Show a loader (while items are loading/fetching)
+     */
+    showLoader?: boolean;
+    /**
+     * Custom loader element
+     */
+    customLoaderElement?: JSX.Element;
   };
 
 export type PickerPropsWithSingle = PickerBaseProps & {
@@ -296,6 +357,9 @@ export interface PickerContextProps
   isMultiMode: boolean;
   onSelectedLayout: (event: any) => any;
   selectionLimit: PickerProps['selectionLimit'];
+  areAllItemsSelected: boolean;
+  selectedCount: number;
+  toggleAllItemsSelection?: (selectAll: boolean) => void;
 }
 
 export type PickerItemsListProps = Pick<
@@ -304,6 +368,10 @@ export type PickerItemsListProps = Pick<
   | 'listProps'
   | 'renderHeader'
   | 'useSafeArea'
+  | 'showLoader'
+  | 'customLoaderElement'
+  | 'renderCustomTopElement'
+  | 'selectionStatus'
   | 'showSearch'
   | 'searchStyle'
   | 'searchPlaceholder'

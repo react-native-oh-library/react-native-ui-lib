@@ -1,6 +1,6 @@
 import _ from 'lodash';
-import React, {useCallback, useContext, useState, useMemo} from 'react';
-import {StyleSheet, FlatList, TextInput, ListRenderItemInfo} from 'react-native';
+import React, {useCallback, useContext, useMemo, useState} from 'react';
+import {StyleSheet, FlatList, TextInput, ListRenderItemInfo, ActivityIndicator} from 'react-native';
 import {Typography, Colors} from '../../style';
 import Assets from '../../assets';
 import Modal from '../modal';
@@ -13,6 +13,7 @@ import {PickerItemProps, PickerItemsListProps, PickerSingleValue, PickerModes} f
 import PickerContext from './PickerContext';
 import PickerItem from './PickerItem';
 import {Constants} from '../../commons/new';
+import PickerSelectionStatusBar from './PickerSelectionStatusBar';
 
 const keyExtractor = (_item: string, index: number) => index.toString();
 
@@ -32,18 +33,15 @@ const PickerItemsList = (props: PickerItemsListProps) => {
     useSafeArea,
     useDialog,
     mode,
-    testID
+    testID,
+    showLoader,
+    customLoaderElement,
+    renderCustomTopElement,
+    selectionStatus: selectionStatusProps
   } = props;
   const context = useContext(PickerContext);
 
   const [wheelPickerValue, setWheelPickerValue] = useState<PickerSingleValue>(context.value ?? items?.[0]?.value);
-  // TODO: Might not need this memoized style, instead we can move it to a stylesheet
-  const wrapperContainerStyle = useMemo(() => {
-    // const shouldFlex = Constants.isWeb ? 1 : useDialog ? 1 : 1;
-    const shouldFlex = true;
-    const style = {flex: shouldFlex ? 1 : 0, maxHeight: Constants.isWeb ? Constants.windowHeight * 0.75 : undefined};
-    return style;
-  }, [/* useDialog */]);
 
   const renderSearchInput = () => {
     if (showSearch) {
@@ -56,7 +54,7 @@ const PickerItemsList = (props: PickerItemsListProps) => {
           <Icon
             style={styles.searchIcon}
             tintColor={Colors.$iconDefault}
-            source={searchStyle.icon || Assets.icons.search}
+            source={searchStyle.icon || Assets.internal.icons.search}
           />
           <TextInput
             testID={testID}
@@ -84,6 +82,13 @@ const PickerItemsList = (props: PickerItemsListProps) => {
     return <PickerItem {...item}/>;
   }, []);
 
+  const _listProps = useMemo(() => {
+    return {
+      ...listProps,
+      style: [styles.list, listProps?.style]
+    };
+  }, [listProps]);
+
   const renderList = () => {
     if (items) {
       return (
@@ -92,7 +97,7 @@ const PickerItemsList = (props: PickerItemsListProps) => {
           data={items}
           renderItem={renderPropItems}
           keyExtractor={keyExtractor}
-          {...listProps}
+          {..._listProps}
         />
       );
     }
@@ -103,7 +108,7 @@ const PickerItemsList = (props: PickerItemsListProps) => {
         renderItem={renderItem}
         keyExtractor={keyExtractor}
         testID={`${testID}.list`}
-        {...listProps}
+        {..._listProps}
       />
     );
   };
@@ -123,6 +128,10 @@ const PickerItemsList = (props: PickerItemsListProps) => {
     );
   };
 
+  const onDonePress = useCallback(() => {
+    context.onPress(wheelPickerValue);
+  }, [context.onPress, wheelPickerValue]);
+
   const renderPickerHeader = () => {
     const {cancelButtonProps, cancelLabel, doneLabel, title, titleStyle, containerStyle, onDone, onCancel} =
       topBarProps ?? {};
@@ -133,7 +142,14 @@ const PickerItemsList = (props: PickerItemsListProps) => {
         <View row spread padding-page style={containerStyle}>
           {(cancelButtonProps || cancelLabel) && renderCancel()}
           <Text style={titleStyle}>{title}</Text>
-          <Text text70 $textPrimary accessibilityRole={'button'} onPress={() => context.onPress(wheelPickerValue)}>
+          <Text
+            text70
+            $textPrimary
+            accessibilityElementsHidden={useWheelPicker}
+            importantForAccessibility={useWheelPicker ? 'no' : 'yes'}
+            accessibilityRole={'button'}
+            onPress={onDonePress}
+          >
             {doneLabel ?? 'Select'}
           </Text>
         </View>
@@ -156,27 +172,47 @@ const PickerItemsList = (props: PickerItemsListProps) => {
     );
   };
 
+  const renderLoader = () => {
+    return (
+      customLoaderElement || (
+        <View flex centerV useSafeArea>
+          <ActivityIndicator/>
+        </View>
+      )
+    );
+  };
+
+  const selectionStatus = useMemo(() => mode === PickerModes.MULTI && selectionStatusProps && <PickerSelectionStatusBar {...selectionStatusProps}/>,
+    [selectionStatusProps, mode]);
+
   const renderContent = () => {
     return useWheelPicker ? (
       renderWheel()
     ) : (
       <>
         {renderSearchInput()}
+        {renderCustomTopElement?.(context.value)}
+        {selectionStatus}
         {renderList()}
       </>
     );
   };
 
   return (
-    <View bg-$backgroundDefault style={wrapperContainerStyle} useSafeArea={useSafeArea}>
+    <View style={styles.container} useSafeArea={useSafeArea}>
       {renderPickerHeader()}
-      {renderContent()}
+      {showLoader ? renderLoader() : renderContent()}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   modalBody: {},
+  container: {
+    minHeight: 250,
+    flexShrink: 1,
+    maxHeight: Constants.isWeb ? Constants.windowHeight * 0.75 : undefined
+  },
   searchInputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -192,6 +228,9 @@ const styles = StyleSheet.create({
     paddingRight: 16,
     flex: 1,
     ...Typography.text70
+  },
+  list: {
+    height: '100%'
   }
 });
 

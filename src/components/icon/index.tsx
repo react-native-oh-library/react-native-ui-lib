@@ -9,7 +9,7 @@ import Badge, {BadgeProps} from '../badge';
 import SvgImage from '../svgImage';
 import type {ImageProps} from '../image';
 
-export type IconProps = Omit<RNImageProps, 'source'> &
+export type IconProps = Omit<RNImageProps, 'source' | 'tintColor'> &
   MarginModifiers &
   RecorderProps & {
     /**
@@ -31,7 +31,7 @@ export type IconProps = Omit<RNImageProps, 'source'> &
     /**
      * the icon size
      */
-    size?: number;
+    size?: number | {width: number; height: number};
     /**
      * whether the icon should flip horizontally on RTL
      */
@@ -47,16 +47,14 @@ export type IconProps = Omit<RNImageProps, 'source'> &
 
 type Props = IconProps & BaseComponentInjectedProps;
 
-const DEFAULT_WEB_ICON_SIZE = 16;
-
 const Icon = forwardRef((props: Props, ref: any) => {
   const {
-    size = Constants.isWeb ? DEFAULT_WEB_ICON_SIZE : undefined,
+    size,
     tintColor,
     style,
     supportRTL,
     source,
-    assetGroup,
+    assetGroup = 'icons',
     assetName,
     modifiers,
     recorderTag,
@@ -64,7 +62,6 @@ const Icon = forwardRef((props: Props, ref: any) => {
     ...others
   } = props;
   const {margins} = modifiers;
-  const iconSize = size ? {width: size, height: size} : undefined;
   const shouldFlipRTL = supportRTL && Constants.isRTL;
 
   const getBadgeStyling = (): StyleProp<ViewStyle> => {
@@ -79,6 +76,16 @@ const Icon = forwardRef((props: Props, ref: any) => {
     return [badgePosition, containerStyle];
   };
 
+  const iconSize = useMemo(() => {
+    if (typeof size === 'number') {
+      return {width: size, height: size};
+    }
+    if (typeof size === 'object') {
+      return size;
+    }
+    return undefined;
+  }, [size]);
+
   const iconSource = useMemo(() => {
     if (!isUndefined(assetName)) {
       return getAsset(assetName, assetGroup);
@@ -86,17 +93,19 @@ const Icon = forwardRef((props: Props, ref: any) => {
     return source;
   }, [source, assetGroup, assetName]);
 
-  const renderImage = () => (
-    <Image
-      accessible={false}
-      accessibilityRole={'image'}
-      fsTagName={recorderTag}
-      {...others}
-      ref={ref}
-      source={iconSource}
-      style={[margins, iconSize, shouldFlipRTL && styles.rtlFlipped, !!tintColor && {tintColor}, style]}
-    />
-  );
+  const renderImage = () => {
+    return (
+      <Image
+        accessible={false}
+        accessibilityRole={'image'}
+        fsTagName={recorderTag}
+        {...others}
+        ref={ref}
+        source={iconSource}
+        style={[margins, iconSize, shouldFlipRTL && styles.rtlFlipped, !!tintColor && {tintColor}, style]}
+      />
+    );
+  };
 
   const renderSvg = () => <SvgImage fsTagName={recorderTag} data={source} {...iconSize} {...props}/>;
 

@@ -1,6 +1,6 @@
-# @react-native-oh-tpl/react-native-ui-lib
+# @react-native-ohos/react-native-ui-lib
 
-This project is based on [react-native-ui-lib](https://github.com/wix/react-native-ui-lib)
+This project is based on [react-native-ui-lib@v7.43.0](https://github.com/wix/react-native-ui-lib/tree/7.43.0)
 
 ## Documentation
 

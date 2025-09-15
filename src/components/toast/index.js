@@ -239,7 +239,7 @@ export default class Toast extends PureBaseComponent {
         <Button
           link
           iconStyle={{tintColor: textColor}}
-          iconSource={Assets.icons.x}
+          iconSource={Assets.internal.icons.x}
           onPress={this.onDismiss}
           paddingR-20
           accessibilityLabel={'dismiss'}
@@ -338,7 +338,7 @@ export default class Toast extends PureBaseComponent {
         <View
           useSafeArea
           animated
-          style={[{backgroundColor: bg, opacity}, style]}
+          style={{backgroundColor: bg, opacity, ...style}}
           onLayout={this.onToastLayout}
           pointerEvents={visible ? 'auto' : 'none'}
         >

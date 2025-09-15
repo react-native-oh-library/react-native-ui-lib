@@ -14,6 +14,7 @@ import {BlurViewPackage} from '../../optionalDependencies';
 import {Constants, asBaseComponent} from '../../commons/new';
 import TopBar, {ModalTopBarProps} from './TopBar';
 import View from '../../components/view';
+import {LogService} from 'services';
 
 const BlurView = BlurViewPackage?.BlurView;
 
@@ -45,7 +46,7 @@ export interface ModalProps extends RNModalProps {
    */
   accessibilityLabel?: string;
   /**
-   * Should add a GestureHandlerRootView (Android only)
+   * Should add a GestureHandlerRootView
    */
   useGestureHandlerRootView?: boolean;
   /**
@@ -73,7 +74,8 @@ class Modal extends Component<ModalProps> {
     super(props);
 
     if (props.enableModalBlur && !BlurView) {
-      console.error(`RNUILib Modal's "enableModalBlur" prop requires installing "@react-native-community/blur" dependency`);
+      // eslint-disable-next-line max-len
+      LogService.error(`RNUILib Modal's "enableModalBlur" prop requires installing "@react-native-community/blur" dependency`);
     }
   }
 
@@ -112,9 +114,8 @@ class Modal extends Component<ModalProps> {
       ...others
     } = this.props;
     const defaultContainer = enableModalBlur && Constants.isIOS && BlurView ? BlurView : View;
-    const useGestureHandler = useGestureHandlerRootView && Constants.isAndroid;
-    const GestureContainer = useGestureHandler ? GestureHandlerRootView : React.Fragment;
-    const gestureContainerProps = useGestureHandler ? {style: styles.fill} : {};
+    const GestureContainer = useGestureHandlerRootView ? GestureHandlerRootView : React.Fragment;
+    const gestureContainerProps = useGestureHandlerRootView ? {style: styles.fill} : {};
     const useKeyboardAvoiding = useKeyboardAvoidingView && Constants.isIOS;
     const KeyboardAvoidingContainer = useKeyboardAvoiding ? KeyboardAvoidingView : React.Fragment;
     const keyboardAvoidingContainerProps = useKeyboardAvoiding

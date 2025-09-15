@@ -22,9 +22,17 @@
     }
   ],
   "snippet": [
-    "<RadioGroup initialValue={currentValue$1} onValueChange={onValueChange$2}>",
-    "  <RadioButton value={'yes'$3} label={'Yes'$4}/>",
-    "  <RadioButton value={'no'$5} label={'No'$6}/>",
-    "</RadioGroup>"
+    "function Example(props) {",
+    "  const [currentValue, setCurrentValue] = useState('yes');",
+    "  return (",
+    "    <View flex padding-s5>",
+    "      <RadioGroup initialValue={currentValue} onValueChange={setCurrentValue} gap-s4>",
+    "        <RadioButton value={'yes'} label={'Yes'}/>",
+    "        <RadioButton value={'no'} label={'No'}/>",
+    "        <RadioButton value={'maybe'} label={'Maybe'}/>",
+    "      </RadioGroup>",
+    "    </View>",
+    "  );",
+    "}"
   ]
 }

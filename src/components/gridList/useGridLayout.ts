@@ -37,7 +37,7 @@ const useGridLayout = (props: GridListBaseProps) => {
   }, [numColumns, maxItemWidth, itemSpacing, keepItemSize ? _containerWidth : undefined]);
 
   const itemWidth = useMemo(() => {
-    return (_containerWidth - itemSpacing * (numberOfColumns - 1)) / numberOfColumns;
+    return Math.floor((_containerWidth - itemSpacing * (numberOfColumns - 1)) / numberOfColumns);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [numberOfColumns, itemSpacing, keepItemSize ? undefined : _containerWidth]);
@@ -58,7 +58,15 @@ const useGridLayout = (props: GridListBaseProps) => {
     return [{columnGap: itemSpacing}, columnWrapperStyle];
   }, [itemSpacing, columnWrapperStyle]);
 
-  return {itemContainerStyle, numberOfColumns, listStyle, listContentStyle, listColumnWrapperStyle};
+  return {
+    itemContainerStyle,
+    numberOfColumns,
+    itemWidth,
+    itemSpacing,
+    listStyle,
+    listContentStyle,
+    listColumnWrapperStyle
+  };
 };
 
 export default useGridLayout;

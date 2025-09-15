@@ -80,7 +80,7 @@ const Input = ({
 const styles = StyleSheet.create({
   input: {
     flexGrow: 1,
-    textAlign: Constants.isRTL ? 'right' : 'left',
+    textAlign: Constants.isRTL ? 'right' : undefined,
     // Setting paddingTop/Bottom separately fix height issues on iOS with multiline
     paddingTop: 0,
     paddingBottom: 0,
@@ -93,7 +93,6 @@ const styles = StyleSheet.create({
     })
   },
   webStyle: {
-    // @ts-expect-error
     outlineWidth: 0
   }
 });

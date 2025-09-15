@@ -18,7 +18,7 @@ import {Constants, asBaseComponent} from '../../commons/new';
 import {extractAccessibilityProps} from '../../commons/modifiers';
 import {Colors} from '../../style';
 import View from '../view';
-import IncubatorSlider from '../../incubator/Slider';
+import IncubatorSlider from '../../incubator/slider';
 import {SliderProps} from './types';
 import Thumb from './Thumb';
 
@@ -45,9 +45,9 @@ type Measurements = {
   height: number;
 };
 
-type ThumbStyle = {style?: StyleProp<ViewStyle>; left?: StyleProp<number>};
+type ThumbStyle = {style?: StyleProp<ViewStyle>; left?: number};
 
-type MinTrackStyle = {style?: StyleProp<ViewStyle>; width?: StyleProp<number>; left?: StyleProp<number>};
+type MinTrackStyle = {style?: StyleProp<ViewStyle>; width?: number; left?: number};
 
 type MeasuredVariableName = 'containerSize' | 'trackSize' | 'thumbSize';
 
