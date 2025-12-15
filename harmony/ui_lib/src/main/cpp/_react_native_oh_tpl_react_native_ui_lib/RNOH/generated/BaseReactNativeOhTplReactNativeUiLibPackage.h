@@ -13,6 +13,7 @@
 #include "../../RNOH/generated/components/KeyboardTrackingViewTempJSIBinder.h"
 #include "../../../CustomInputControllerTemp.h"
 #include "../../../KeyboardTrackingViewTempManager.h"
+#include "../../../KeyboardTrackingViewTempTurboModule.h"
 #include "../../../HighlighterViewComponentDescriptor.h"
 #include "../../../HighlighterViewJSIBinder.h"
 #include "../../../KeyboardTrackingViewTempArkTSComponentDescriptor.h"
@@ -28,6 +29,9 @@ class BaseReactNativeOhTplReactNativeUiLibPackageTurboModuleFactoryDelegate : pu
         }
         if (name == "KeyboardTrackingViewTempManager") {
             return std::make_shared<KeyboardTrackingViewTempManager>(ctx, name);
+        }
+        if (name == "KeyboardTrackingViewTempTurboModule") {
+            return std::make_shared<KeyboardTrackingViewTempTurboModule>(ctx, name);
         }
         return nullptr;
     };
