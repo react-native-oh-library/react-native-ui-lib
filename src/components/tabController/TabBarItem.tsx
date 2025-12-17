@@ -119,6 +119,8 @@ export default function TabBarItem({
   label,
   labelColor = DEFAULT_LABEL_COLOR,
   selectedLabelColor = DEFAULT_SELECTED_LABEL_COLOR,
+  iconColor,          // 新增：图标颜色
+  selectedIconColor,  // 新增：选中图标颜色
   labelStyle,
   labelProps,
   selectedLabelStyle,
@@ -150,6 +152,10 @@ export default function TabBarItem({
   //       which throws an error (see https://github.com/software-mansion/react-native-reanimated/issues/3164)
   const inactiveColor = useRef(_.cloneDeep(labelColor));
   const activeColor = useRef(_.cloneDeep(!ignore ? selectedLabelColor : inactiveColor.current));
+
+  const iconInactiveColor = useRef(_.cloneDeep(iconColor || labelColor));
+  const iconActiveColor =
+    useRef(_.cloneDeep(!ignore ? (selectedIconColor || selectedLabelColor) : iconInactiveColor.current));
 
   useEffect(() => {
     if (props.width) {
@@ -191,7 +197,7 @@ export default function TabBarItem({
   const animatedIconStyle = useAnimatedStyle(() => {
     const isActive = currentPage.value === index;
     return {
-      tintColor: isActive ? activeColor.current : inactiveColor.current
+      tintColor: isActive ? iconActiveColor.current : iconInactiveColor.current
     };
   });
 

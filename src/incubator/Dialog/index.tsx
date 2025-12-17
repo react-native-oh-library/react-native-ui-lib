@@ -1,5 +1,5 @@
 import React, {useMemo, useCallback, useImperativeHandle, forwardRef, ForwardedRef, useEffect, useState} from 'react';
-import {StyleSheet, View as RNView} from 'react-native';
+import {Platform, StyleSheet, View as RNView} from 'react-native';
 import hoistStatics from 'hoist-non-react-statics';
 import {
   Extrapolation,
@@ -115,7 +115,7 @@ const Dialog = (props: DialogProps, ref: ForwardedRef<DialogImperativeMethods>) 
     if (wasMeasured) {
       if (modalVisibility) {
         open();
-      } else if (Constants.isAndroid) {
+      } else if (Constants.isAndroid || (Platform.OS as string) === 'harmony') {
         onDismiss?.();
       }
     }
