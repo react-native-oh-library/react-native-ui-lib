@@ -1,44 +1,64 @@
 const fs = require('fs');
 const path = require('path');
 
-// 源文件路径
 const sourceDir = path.join(__dirname, '../lib/components/DynamicFonts');
 
-// 目标目录（库 B）
-const targetDir = path.join(__dirname, '../../../react-native-ui-lib/lib/components/DynamicFonts');
-
-const targetUilibDir = path.join(__dirname, '../../../uilib-native/components/DynamicFonts');
-
-// 文件列表
-const filesToCopy = [
-  'PermissionsAcquirer.harmony.d.ts',
-  'PermissionsAcquirer.harmony.js'
-];
-
-// 确保目标目录存在，如果不存在则创建它
-if (!fs.existsSync(targetDir)) {
-  fs.mkdirSync(targetDir, { recursive: true });
-}
-
-if (!fs.existsSync(targetUilibDir)) {
-  fs.mkdirSync(targetUilibDir, { recursive: true });
-}
-
-// 复制文件函数
-async function copyFiles() {
-  for (const file of filesToCopy) {
-    const sourceFile = path.join(sourceDir, file);
-    const targetFile = path.join(targetDir, file);
-    const targetUilibFile = path.join(targetUilibDir, file);
-     
-    try {
-      await fs.promises.copyFile(sourceFile, targetFile);
-      await fs.promises.copyFile(sourceFile, targetUilibFile);
-    } catch (err) {
-      process.exit(1); // 退出并返回错误代码
+function safeCopy(targetBasePath) {
+    if (!fs.existsSync(targetBasePath)) {
+        return;
     }
-  }
+
+    const filesToCopy = [
+        'PermissionsAcquirer.harmony.d.ts',
+        'PermissionsAcquirer.harmony.js'
+    ];
+
+    let targetDir;
+    if (targetBasePath.includes('react-native-ui-lib')) {
+        targetDir = path.join(targetBasePath, 'lib/components/DynamicFonts');
+    } else {
+        targetDir = path.join(targetBasePath, 'components/DynamicFonts');
+    }
+
+    if (!fs.existsSync(targetDir)) {
+        try {
+            fs.mkdirSync(targetDir, { recursive: true });
+        } catch (e) { return; }
+    }
+
+    filesToCopy.forEach(file => {
+        const src = path.join(sourceDir, file);
+        const dest = path.join(targetDir, file);
+        try {
+            if (fs.existsSync(src)) {
+                fs.copyFileSync(src, dest);
+            }
+        } catch (e) {
+            console.warn(`[Warn] Failed to copy ${file}: ${e.message}`);
+        }
+    });
 }
 
-// 执行文件复制操作
-copyFiles();
+// 尝试向上查找 node_modules 目录
+let currentDir = __dirname;
+let nodeModulesPath = null;
+for(let i=0; i<5; i++) {
+    if (path.basename(currentDir) === 'node_modules') {
+        nodeModulesPath = currentDir;
+        break;
+    }
+    currentDir = path.join(currentDir, '..');
+}
+
+if (nodeModulesPath) {
+    safeCopy(path.join(nodeModulesPath, 'react-native-ui-lib'));
+    safeCopy(path.join(nodeModulesPath, 'uilib-native'));
+} else {
+    // 如果找不到 node_modules 结构，尝试使用相对路径兜底
+    try {
+        const legacyTarget1 = path.join(__dirname, '../../../react-native-ui-lib');
+        safeCopy(legacyTarget1);
+        const legacyTarget2 = path.join(__dirname, '../../../uilib-native');
+        safeCopy(legacyTarget2);
+    } catch(e) {}
+}
