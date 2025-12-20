@@ -287,7 +287,8 @@ const DateTimePicker = forwardRef((props: DateTimePickerPropsInternal, ref: Forw
     return (
       <RNDateTimePicker
         // harmony侧 @react-native-community/datetimepicker 父节点或组件需要设置宽高才进行展示
-        style={Platform.OS as any === 'harmony' ? { width: '100%', height: 240, backgroundColor: '#fff', dateTimePickerStyle } : {}}
+        style={Platform.OS as any === 'harmony' ?
+          { width: '100%', height: 240, backgroundColor: backgroundColor, dateTimePickerStyle } : {}}
         mode={mode}
         value={value || new Date()}
         onChange={handleChange}
