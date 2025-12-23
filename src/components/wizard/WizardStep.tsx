@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import React, {Component} from 'react';
-import {StyleSheet} from 'react-native';
+import {StyleSheet, Platform } from 'react-native';
 import View from '../view';
 import Text from '../text';
 import Image from '../image';
@@ -42,9 +42,15 @@ class WizardStep extends Component<Props> {
   }
 
   getAccessibilityLabel() {
-    const {index, label, state} = this.props;
+    const { index, label, accessibilityInfo, state } = this.props;
     const config = StatesConfig[state];
-    const extraInfo = config?.accessibilityInfo || '';
+    let extraInfo = '';
+    if (Platform.OS as string === 'harmony') {
+      extraInfo = accessibilityInfo || config?.accessibilityInfo || '';
+    } else {
+      extraInfo = config?.accessibilityInfo || '';
+    }
+
     return `Step ${index + 1}, ${label}, ${extraInfo}`;
   }
 

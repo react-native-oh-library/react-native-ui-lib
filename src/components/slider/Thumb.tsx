@@ -7,7 +7,8 @@ import {
   ViewProps,
   View as RNView,
   Animated,
-  GestureResponderEvent
+  GestureResponderEvent,
+  Platform
 } from 'react-native';
 import {useCombinedRefs} from 'hooks';
 import {Colors} from '../../style';
@@ -88,7 +89,21 @@ const Thumb = forwardRef((props: ThumbProps, ref: any) => {
       const activeStyle = activeThumbStyle || styles.activeThumb;
       const activeOrInactiveStyle = !disabled ? (start ? activeStyle : style) : {};
 
-      thumbStyles.style = _.omit(activeOrInactiveStyle, 'height', 'width');
+      if (Platform.OS as string === 'harmony') {
+          // 处理backgroundColor的特殊情况
+          const backgroundColor = !disabled ?
+          start ?
+            (activeStyle.backgroundColor || (thumbTintColor || ACTIVE_COLOR)) :
+            (style.backgroundColor || (thumbTintColor || ACTIVE_COLOR)) :
+          DEFAULT_COLOR;
+
+        thumbStyles.style = {
+          ..._.omit(activeOrInactiveStyle, 'height', 'width', 'backgroundColor'),
+          backgroundColor
+        };
+      } else {
+        thumbStyles.style = _.omit(activeOrInactiveStyle, 'height', 'width');
+      }
       //@ts-expect-error
       thumbRef.current?.setNativeProps?.(thumbStyles);
 

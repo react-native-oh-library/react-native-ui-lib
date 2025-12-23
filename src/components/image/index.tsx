@@ -8,7 +8,8 @@ import {
   ImageBackground,
   ImageBackgroundProps,
   NativeSyntheticEvent,
-  ImageErrorEventData
+  ImageErrorEventData,
+  Platform
 } from 'react-native';
 import {
   Constants,
@@ -193,8 +194,9 @@ class Image extends PureComponent<Props, State> {
   };
 
   onError = (event: NativeSyntheticEvent<ImageErrorEventData>) => {
-    if (event.nativeEvent.error) {
-      this.setState({error: true});
+    if (event.nativeEvent.error
+      || (Platform.OS as string === 'harmony' && event.nativeEvent.source.error)) {
+      this.setState({ error: true });
       this.props.onError?.(event);
     }
   };
@@ -312,7 +314,7 @@ const styles = StyleSheet.create({
   },
   errorImageContainer: {
     backgroundColor: Colors.grey70,
-    zIndex: -1
+    zIndex: (Platform.OS as string === 'harmony') ? 0 : -1
   },
   shrink: {
     flexShrink: 1
