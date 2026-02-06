@@ -44,7 +44,7 @@ const usePresenter = <T extends WheelPickerItemValue>({
       //@ts-expect-error
       return _.findIndex(items, {value: initialValue?.value});
     } else {
-      return initialValue && _.findIndex(items, (item) => item.value === initialValue);
+      return initialValue !== undefined && initialValue !== null ? _.findIndex(items, (item) => item.value === initialValue) : -1;
     }
   };
 
