@@ -89,3 +89,5 @@ expoDemo/ios/Pods
 /coverage
 
 
+harmony/ui_lib/BuildProfile.ets
+harmony/ui_lib/oh-package-lock.json5
