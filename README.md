@@ -4,9 +4,9 @@ This project is based on [react-native-ui-lib@v7.43.0](https://github.com/wix/re
 
 ## Documentation
 
-- [中文](https://gitee.com/react-native-oh-library/usage-docs/blob/master/zh-cn/react-native-ui-lib.md)
+- [中文](https://gitcode.com/OpenHarmony-RN/usage-docs/blob/master/zh-cn/react-native-ui-lib.md)
 
-- [English](https://gitee.com/react-native-oh-library/usage-docs/blob/master/en/react-native-ui-lib.md)
+- [English](https://gitcode.com/OpenHarmony-RN/usage-docs/blob/master/en/react-native-ui-lib.md)
 
 ## License
 
